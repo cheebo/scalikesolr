@@ -29,11 +29,18 @@ case class SolrDocument(@BeanProperty val writerType: WriterType = WriterType.St
     if (map != null && map.size > 0) {
       map
     } else {
+      println(rawBody)
       import collection.JavaConverters._
       (writerType match {
         case WriterType.Standard =>
           XML.loadString(rawBody).child map {
-            case elem: Node => ((elem \ "@name").toString, new SolrDocumentValue(elem.text))
+            case elem: Node if elem.label == "arr" =>
+              ((elem \ "@name").toString,
+                new SolrDocumentValue(elem.child.map(item => item.text).toList.mkString("List(", ",", ")")))
+            case elem: Node => {
+              println(elem)
+              ((elem \ "@name").toString, new SolrDocumentValue(elem.text))
+            }
           }
         case WriterType.JavaBinary =>
           rawJavabin.getFieldNames.asScala map (e => (e.toString -> new SolrDocumentValue(rawJavabin.get(e).toString)))
