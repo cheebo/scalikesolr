@@ -29,7 +29,6 @@ case class SolrDocument(@BeanProperty val writerType: WriterType = WriterType.St
     if (map != null && map.size > 0) {
       map
     } else {
-      println(rawBody)
       import collection.JavaConverters._
       (writerType match {
         case WriterType.Standard =>
